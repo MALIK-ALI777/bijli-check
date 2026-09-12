@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bill Checker — BijliCheck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1B2A1F; --paper: #F3F1E7; --paper-raised: #FFFFFF;
+    --brand: #B4592A; --brand-dark: #8F4520; --brand-tint: #F3E3D8;
+    --muted: #6B6B5D; --line: #DCD8C6;
+    --red: #B3372B; --amber: #B07D1E; --green: #3D7A4E;
+    --red-bg: #F8E9E6; --amber-bg: #F7EFDC; --green-bg: #E8F1E9;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.55;
+  }
+  h1, h2 { font-family: 'Fraunces', Georgia, serif; margin: 0; letter-spacing: -0.01em; }
+
+  .nav { background: var(--paper-raised); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; }
+  .nav-inner { max-width: 980px; margin: 0 auto; padding: 14px 22px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { font-family: 'Fraunces', serif; font-weight: 700; font-size: 19px; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+  .nav-logo .bolt { color: var(--brand); }
+  .nav-links { display: flex; gap: 26px; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 14.5px; font-weight: 500; padding: 6px 0; border-bottom: 2px solid transparent; }
+  .nav-links a:hover, .nav-links a.active { color: var(--ink); border-bottom-color: var(--brand); }
+
+  .wrap { max-width: 640px; margin: 0 auto; padding: 40px 22px 70px; }
+  .page-head { margin-bottom: 26px; }
+  .page-head h1 { font-size: 27px; margin-bottom: 8px; }
+  .page-head p { color: var(--muted); font-size: 14.5px; margin: 0; max-width: 50ch; }
+
+  .card { background: var(--paper-raised); border: 1px solid var(--line); border-radius: 12px; padding: 22px; margin-bottom: 18px; }
+  .card h2 { font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 16px; font-family: 'Inter', sans-serif; font-weight: 700; }
+
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { display: block; font-size: 13.5px; margin-bottom: 6px; font-weight: 500; }
+  .field .hint { font-size: 12px; color: var(--muted); margin-top: 5px; }
+  .field input, .field select {
+    width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px;
+    font-family: inherit; font-size: 14.5px; background: #fff; color: var(--ink);
+  }
+  .field input:focus, .field select:focus { outline: 2px solid var(--brand); outline-offset: 1px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  button.primary {
+    background: var(--brand); color: #fff; border: none; border-radius: 8px;
+    padding: 13px 20px; font-size: 15px; font-weight: 600; cursor: pointer;
+    font-family: inherit; width: 100%; transition: background 0.15s ease;
+  }
+  button.primary:hover { background: var(--brand-dark); }
+
+  #result { display: none; }
+
+  .verdict-band { border-radius: 9px; padding: 15px 17px; margin-bottom: 18px; font-size: 14.5px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .verdict-band.green { background: var(--green-bg); color: var(--green); }
+  .verdict-band.amber { background: var(--amber-bg); color: var(--amber); }
+  .verdict-band.red { background: var(--red-bg); color: var(--red); }
+
+  .breakdown-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .breakdown-row:last-child { border-bottom: none; font-weight: 700; padding-top: 12px; }
+  .breakdown-row .lbl { color: var(--muted); }
+  .breakdown-row:last-child .lbl { color: var(--ink); }
+
+  .explainer { background: var(--amber-bg); border: 1px solid #E7D6A8; border-radius: 9px; padding: 17px 19px; font-size: 14px; line-height: 1.65; margin-bottom: 18px; }
+  .explainer strong { color: var(--brand-dark); }
+
+  .margin-box { background: var(--green-bg); border: 1px solid #C9DFCC; border-radius: 9px; padding: 17px 19px; font-size: 14px; line-height: 1.65; }
+  .margin-box.tight { background: var(--red-bg); border-color: #E9C7C2; }
+  .margin-box strong { color: var(--green); }
+  .margin-box.tight strong { color: var(--red); }
+
+  .disclaimer { font-size: 12px; color: var(--muted); margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line); }
+
+  .site-footer { border-top: 1px solid var(--line); margin-top: 20px; padding: 26px 22px; text-align: center; font-size: 12.5px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><span class="bolt">⚡</span>BijliCheck</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="calculator.html" class="active">Bill Checker</a>
+      <a href="guide.html">Slab Guide</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="page-head">
+    <h1>Bill Checker</h1>
+    <p>Enter your usage and current published rates for a full breakdown, an overbilling flag, and how close you are to the next slab.</p>
+  </div>
+
+  <div class="card">
+    <h2>Your usage</h2>
+    <div class="field">
+      <label for="units">Units consumed this month</label>
+      <input type="number" id="units" placeholder="e.g. 210" min="0">
+    </div>
+    <div class="field">
+      <label for="avgUnits">Average monthly units over the last 6 months</label>
+      <input type="number" id="avgUnits" placeholder="e.g. 180" min="0">
+      <p class="hint">Used to check protected vs. unprotected status — this rule trips up most people.</p>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label for="phase">Connection type</label>
+        <select id="phase">
+          <option value="single">Single phase</option>
+          <option value="three">Three phase</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="hasAC">AC registered on meter?</label>
+        <select id="hasAC">
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Current published rates</h2>
+    <div class="field">
+      <label for="fca">Fuel Charge Adjustment (FCA) this month — Rs per unit</label>
+      <input type="number" id="fca" step="0.01" placeholder="e.g. 2.80">
+      <p class="hint">Changes monthly — check your DISCO's website or last bill for the current figure.</p>
+    </div>
+    <div class="field">
+      <label for="actualBill">What you were actually billed this month (Rs) — optional</label>
+      <input type="number" id="actualBill" placeholder="e.g. 8500">
+    </div>
+  </div>
+
+  <button class="primary" id="checkBtn">Check my bill</button>
+
+  <div id="result" style="margin-top: 22px;">
+    <div class="verdict-band" id="verdictBand"></div>
+
+    <div class="card">
+      <h2>Estimated bill breakdown</h2>
+      <div id="breakdownList"></div>
+    </div>
+
+    <div class="explainer" id="explainerBox"></div>
+    <div class="margin-box" id="marginBox"></div>
+
+    <p class="disclaimer">This gives a rough estimate based on the published domestic slab structure, not an exact figure — taxes, surcharges, and monthly adjustments beyond FCA can shift the final number slightly. Always cross-check against your DISCO's official duplicate bill.</p>
+
+    <div class="card" id="askCard">
+      <h2>Ask about your bill</h2>
+      <p style="font-size:13px; color:var(--muted); margin:0 0 14px;">Powered by retrieval + generation: it looks up the relevant slab rules first, then answers using your actual computed numbers above — not a generic guess.</p>
+      <div class="field">
+        <input type="text" id="askInput" placeholder="e.g. why is my bill so much higher this month?">
+      </div>
+      <button class="primary" id="askBtn" type="button">Ask</button>
+      <div id="askStatus" style="font-size:13px; color:var(--brand-dark); margin-top:10px;"></div>
+      <div id="askSources" style="font-size:12px; color:var(--muted); margin-top:10px; display:none;"></div>
+      <div id="askAnswer" style="font-size:14.5px; margin-top:14px; padding-top:14px; border-top:1px solid var(--line); display:none;"></div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  Free, open reference tool — not affiliated with NEPRA or any DISCO.
+</footer>
+
+<script>
+const PROTECTED_SLABS = [
+  { upTo: 100, rate: 10.54 },
+  { upTo: 200, rate: 13.01 }
+];
+const UNPROTECTED_SLABS = [
+  { upTo: 100, rate: 16.72 },
+  { upTo: 200, rate: 21.53 },
+  { upTo: 300, rate: 25.34 },
+  { upTo: 400, rate: 29.10 },
+  { upTo: 500, rate: 33.85 },
+  { upTo: 600, rate: 38.10 },
+  { upTo: 700, rate: 42.90 },
+  { upTo: Infinity, rate: 47.20 }
+];
+const FIXED_CHARGE = { single: 75, three: 150 };
+const TV_FEE = 35;
+const GST_RATE = 0.17;
+
+function rateForUnits(units, slabs) {
+  for (const slab of slabs) if (units <= slab.upTo) return slab;
+  return slabs[slabs.length - 1];
+}
+
+function computeBill({ units, avgUnits, phase, hasAC, fca }) {
+  const isProtected = avgUnits <= 200 && hasAC === 'no' && units <= 200;
+  const slabs = isProtected ? PROTECTED_SLABS : UNPROTECTED_SLABS;
+  const currentSlab = rateForUnits(units, slabs);
+  const slabIndex = slabs.indexOf(currentSlab);
+
+  let effectiveRate = currentSlab.rate;
+  let benefitApplied = false;
+  if (isProtected && slabIndex > 0) {
+    effectiveRate = slabs[slabIndex - 1].rate;
+    benefitApplied = true;
+  }
+
+  const energyCharge = units * effectiveRate;
+  const fcaCharge = units * (fca || 0);
+  const gst = (energyCharge + fcaCharge) * GST_RATE;
+  const fixed = FIXED_CHARGE[phase];
+  const total = energyCharge + fcaCharge + gst + fixed + TV_FEE;
+
+  let previousSlabInfo = null;
+  if (slabIndex > 0) {
+    const prevSlab = slabs[slabIndex - 1];
+    const prevEnergyCharge = units * prevSlab.rate;
+    const prevTotal = prevEnergyCharge + fcaCharge + (prevEnergyCharge + fcaCharge) * GST_RATE + fixed + TV_FEE;
+    previousSlabInfo = { rate: prevSlab.rate, total: prevTotal, threshold: prevSlab.upTo };
+  }
+
+  // Slab safety margin — how many more units before the next slab, and what it would cost.
+  let marginInfo = null;
+  if (currentSlab.upTo !== Infinity) {
+    const unitsRemaining = currentSlab.upTo - units;
+    const nextSlab = slabs[slabIndex + 1];
+    if (nextSlab) {
+      const nextEnergyCharge = (units + 1) * nextSlab.rate;
+      const nextFca = (units + 1) * (fca || 0);
+      const nextTotal = nextEnergyCharge + nextFca + (nextEnergyCharge + nextFca) * GST_RATE + fixed + TV_FEE;
+      marginInfo = { unitsRemaining, nextRate: nextSlab.rate, jump: nextTotal - total };
+    }
+  }
+
+  return { isProtected, effectiveRate, benefitApplied, energyCharge, fcaCharge, gst, fixed, tvFee: TV_FEE, total, currentSlab, previousSlabInfo, marginInfo };
+}
+
+function formatRs(n) { return 'Rs ' + Math.round(n).toLocaleString('en-PK'); }
+
+document.getElementById('checkBtn').addEventListener('click', () => {
+  const units = parseFloat(document.getElementById('units').value);
+  const avgUnits = parseFloat(document.getElementById('avgUnits').value);
+  const phase = document.getElementById('phase').value;
+  const hasAC = document.getElementById('hasAC').value;
+  const fca = parseFloat(document.getElementById('fca').value) || 0;
+  const actualBillInput = document.getElementById('actualBill').value;
+  const actualBill = actualBillInput ? parseFloat(actualBillInput) : null;
+
+  if (isNaN(units) || isNaN(avgUnits)) {
+    alert("Please enter both this month's units and your 6-month average.");
+    return;
+  }
+
+  const result = computeBill({ units, avgUnits, phase, hasAC, fca });
+
+  const verdictBand = document.getElementById('verdictBand');
+  const breakdownList = document.getElementById('breakdownList');
+  const explainerBox = document.getElementById('explainerBox');
+  const marginBox = document.getElementById('marginBox');
+
+  if (actualBill !== null) {
+    const diff = actualBill - result.total;
+    const diffPct = Math.abs(diff) / result.total * 100;
+    if (diffPct < 8) {
+      verdictBand.className = 'verdict-band green';
+      verdictBand.innerHTML = '✓ Your bill is close to the expected estimate (within normal rounding/adjustment range).';
+    } else if (diff > 0) {
+      verdictBand.className = 'verdict-band red';
+      verdictBand.innerHTML = '⚑ You were billed about ' + formatRs(diff) + ' more than the estimate — worth requesting a breakdown from your DISCO.';
+    } else {
+      verdictBand.className = 'verdict-band amber';
+      verdictBand.innerHTML = "ℹ Your bill is actually lower than the estimate — you may be on a different rate category, or extra surcharges weren't counted here.";
+    }
+  } else {
+    verdictBand.className = 'verdict-band amber';
+    verdictBand.innerHTML = 'ℹ Estimate only — add your actual billed amount above to compare directly.';
+  }
+
+  const rows = [
+    { lbl: 'Consumer category', val: result.isProtected ? 'Protected' + (result.benefitApplied ? ' (with one-slab benefit)' : '') : 'Unprotected' },
+    { lbl: 'Effective rate applied', val: 'Rs ' + result.effectiveRate.toFixed(2) + ' / unit' },
+    { lbl: 'Energy charge', val: formatRs(result.energyCharge) },
+    { lbl: 'FCA charge', val: formatRs(result.fcaCharge) },
+    { lbl: 'GST (17%)', val: formatRs(result.gst) },
+    { lbl: 'Fixed monthly charge', val: formatRs(result.fixed) },
+    { lbl: 'TV licence fee', val: formatRs(result.tvFee) },
+    { lbl: 'Estimated total', val: formatRs(result.total) }
+  ];
+  breakdownList.innerHTML = rows.map(r => '<div class="breakdown-row"><span class="lbl">' + r.lbl + '</span><span>' + r.val + '</span></div>').join('');
+
+  if (result.previousSlabInfo) {
+    const gap = result.total - result.previousSlabInfo.total;
+    explainerBox.innerHTML = '<strong>Why this matters:</strong> Because your usage landed above ' + result.previousSlabInfo.threshold + ' units, your entire ' + units + ' units were billed at Rs ' + result.effectiveRate.toFixed(2) + '/unit — not just the units above the threshold. Staying at or under ' + result.previousSlabInfo.threshold + ' units would have put your whole bill at Rs ' + result.previousSlabInfo.rate.toFixed(2) + '/unit instead, for an estimated total of ' + formatRs(result.previousSlabInfo.total) + ' — about ' + formatRs(gap) + ' less.';
+  } else {
+    explainerBox.innerHTML = "<strong>Good to know:</strong> You're in the lowest applicable slab for your usage, so there's no slab-crossing effect on this bill.";
+  }
+
+  if (result.marginInfo) {
+    const tight = result.marginInfo.unitsRemaining <= 10;
+    marginBox.className = tight ? 'margin-box tight' : 'margin-box';
+    marginBox.innerHTML = '<strong>Slab safety margin:</strong> You can use ' + result.marginInfo.unitsRemaining + ' more unit' + (result.marginInfo.unitsRemaining === 1 ? '' : 's') + ' this month before crossing into the next slab (Rs ' + result.marginInfo.nextRate.toFixed(2) + '/unit). Crossing it would add roughly ' + formatRs(result.marginInfo.jump) + ' to your bill.';
+  } else {
+    marginBox.className = 'margin-box';
+    marginBox.innerHTML = "<strong>Slab safety margin:</strong> You're already in the top slab — there's no higher rate to cross into.";
+  }
+
+  document.getElementById('result').style.display = 'block';
+  window.lastResult = result;
+  window.lastUnits = units;
+});
+
+// ---- RAG: small local knowledge base ----
+const KNOWLEDGE_BASE = [
+  { id: 'kb-nontelescopic', text: 'Unprotected consumer billing is non-telescopic: once your usage lands in a slab, that rate applies to your entire month\'s units, not just the units above the previous threshold.' },
+  { id: 'kb-protected-rule', text: 'A consumer is protected only if their 6-month average usage is 200 units or fewer, no AC is registered on the meter, and the current month also stays at or under 200 units.' },
+  { id: 'kb-one-slab-benefit', text: 'Protected consumers get a one-slab benefit: they are billed at the rate of the slab just below the one their actual units fall into.' },
+  { id: 'kb-fca', text: 'FCA (Fuel Charge Adjustment) changes almost every billing month based on fuel costs and is applied on top of the base slab rate — it is not part of the fixed slab table.' },
+  { id: 'kb-ac-rule', text: 'Having an air conditioner registered on the meter removes protected-consumer status regardless of how few units are actually used.' },
+  { id: 'kb-reduce-bill', text: 'To avoid an unexpected jump, a consumer should track units against the current slab\'s upper threshold and reduce usage before crossing it, since crossing re-rates the whole month, not just the extra units.' },
+  { id: 'kb-gst-fixed', text: 'On top of the energy and FCA charges, bills include 17% GST, a fixed monthly charge based on connection type (single vs three phase), and a TV licence fee.' }
+];
+
+function retrieveChunks(question, topN) {
+  const qWords = new Set(question.toLowerCase().split(/\W+/).filter(w => w.length > 2));
+  const scored = KNOWLEDGE_BASE.map(chunk => {
+    const cWords = chunk.text.toLowerCase().split(/\W+/).filter(w => w.length > 2);
+    let score = 0;
+    for (const w of cWords) if (qWords.has(w)) score++;
+    return { chunk, score };
+  });
+  scored.sort((a, b) => b.score - a.score);
+  return scored.filter(s => s.score > 0).slice(0, topN).map(s => s.chunk);
+}
+
+function buildBillSummary() {
+  const r = window.lastResult;
+  if (!r) return null;
+  return 'Units this month: ' + window.lastUnits + '; category: ' + (r.isProtected ? 'Protected' : 'Unprotected') +
+    '; effective rate: Rs ' + r.effectiveRate.toFixed(2) + '/unit; estimated total: Rs ' + Math.round(r.total) +
+    (r.previousSlabInfo ? '; crossed from a lower slab that would have cost Rs ' + Math.round(r.previousSlabInfo.total) : '; did not cross a slab threshold') +
+    (r.marginInfo ? '; ' + r.marginInfo.unitsRemaining + ' units remain before the next slab' : '');
+}
+
+function offlineAnswer(chunks) {
+  if (chunks.length === 0) {
+    return "I couldn't find a specific reference for that in the slab guide — try asking about slabs, FCA, protected status, or your bill jump.";
+  }
+  return chunks.map(c => c.text).join(' ');
+}
+
+document.getElementById('askBtn').addEventListener('click', async () => {
+  const question = document.getElementById('askInput').value.trim();
+  const statusEl = document.getElementById('askStatus');
+  const sourcesEl = document.getElementById('askSources');
+  const answerEl = document.getElementById('askAnswer');
+
+  if (!question) { statusEl.textContent = 'Type a question first.'; return; }
+  if (!window.lastResult) { statusEl.textContent = 'Check your bill above first so I have your numbers to work with.'; return; }
+
+  const chunks = retrieveChunks(question, 3);
+  sourcesEl.style.display = 'block';
+  sourcesEl.innerHTML = chunks.length
+    ? '<strong>Referenced:</strong> ' + chunks.map(c => c.id).join(', ')
+    : '<strong>Referenced:</strong> no specific match found in the slab guide';
+
+  statusEl.textContent = 'Thinking…';
+  answerEl.style.display = 'none';
+
+  try {
+    const res = await fetch('/api/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        question,
+        context: chunks.map(c => c.text),
+        billSummary: buildBillSummary()
+      })
+    });
+    if (!res.ok) throw new Error('backend unreachable');
+    const data = await res.json();
+    answerEl.textContent = data.answer;
+  } catch (e) {
+    answerEl.textContent = '(offline mode — showing retrieved reference info directly) ' + offlineAnswer(chunks);
+  } finally {
+    statusEl.textContent = '';
+    answerEl.style.display = 'block';
+  }
+});
+</script>
+</body>
+</html>

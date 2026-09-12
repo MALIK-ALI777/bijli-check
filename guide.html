@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Slab Guide — BijliCheck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1B2A1F; --paper: #F3F1E7; --paper-raised: #FFFFFF;
+    --brand: #B4592A; --brand-dark: #8F4520; --brand-tint: #F3E3D8;
+    --muted: #6B6B5D; --line: #DCD8C6;
+    --green: #3D7A4E; --green-bg: #E8F1E9; --red: #B3372B; --red-bg: #F8E9E6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.55;
+  }
+  h1, h2 { font-family: 'Fraunces', Georgia, serif; margin: 0; letter-spacing: -0.01em; }
+
+  .nav { background: var(--paper-raised); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; }
+  .nav-inner { max-width: 980px; margin: 0 auto; padding: 14px 22px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { font-family: 'Fraunces', serif; font-weight: 700; font-size: 19px; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+  .nav-logo .bolt { color: var(--brand); }
+  .nav-links { display: flex; gap: 26px; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 14.5px; font-weight: 500; padding: 6px 0; border-bottom: 2px solid transparent; }
+  .nav-links a:hover, .nav-links a.active { color: var(--ink); border-bottom-color: var(--brand); }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: 40px 22px 70px; }
+  .page-head { margin-bottom: 30px; }
+  .page-head h1 { font-size: 27px; margin-bottom: 8px; }
+  .page-head p { color: var(--muted); font-size: 14.5px; margin: 0; max-width: 55ch; }
+
+  .card { background: var(--paper-raised); border: 1px solid var(--line); border-radius: 12px; padding: 22px; margin-bottom: 22px; }
+  .card h2 { font-size: 18px; font-family: 'Fraunces', serif; margin: 0 0 6px; }
+  .card .sub { font-size: 13px; color: var(--muted); margin: 0 0 18px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 6px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.03em; }
+  tr:last-child td { border-bottom: none; }
+
+  .rules-list { margin: 0; padding-left: 20px; font-size: 14px; }
+  .rules-list li { margin-bottom: 10px; }
+
+  .finder .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .finder label { display: block; font-size: 13.5px; margin-bottom: 6px; font-weight: 500; }
+  .finder input { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-family: inherit; font-size: 14.5px; }
+  .finder input:focus { outline: 2px solid var(--brand); outline-offset: 1px; }
+  button.small-primary {
+    background: var(--brand); color: #fff; border: none; border-radius: 8px;
+    padding: 11px 18px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+  button.small-primary:hover { background: var(--brand-dark); }
+  .finder-result { margin-top: 16px; padding: 14px 16px; border-radius: 8px; font-size: 14px; display: none; }
+  .finder-result.show { display: block; }
+  .finder-result.safe { background: var(--green-bg); color: var(--green); }
+  .finder-result.tight { background: var(--red-bg); color: var(--red); }
+
+  .faq-item { border-bottom: 1px solid var(--line); padding: 14px 0; }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-q { font-weight: 600; font-size: 14.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+  .faq-q .chevron { transition: transform 0.15s ease; color: var(--brand); }
+  .faq-item.open .chevron { transform: rotate(180deg); }
+  .faq-a { font-size: 13.5px; color: var(--muted); margin-top: 10px; max-height: 0; overflow: hidden; transition: max-height 0.2s ease; }
+  .faq-item.open .faq-a { max-height: 300px; }
+
+  .site-footer { border-top: 1px solid var(--line); margin-top: 10px; padding: 26px 22px; text-align: center; font-size: 12.5px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><span class="bolt">⚡</span>BijliCheck</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="calculator.html">Bill Checker</a>
+      <a href="guide.html" class="active">Slab Guide</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="page-head">
+    <h1>Slab Guide</h1>
+    <p>The full domestic tariff structure, the rules that decide which slab you fall into, and a quick way to check how close you are to the next one.</p>
+  </div>
+
+  <div class="card finder">
+    <h2>Where do I stand right now?</h2>
+    <p class="sub">Enter today's running units for this billing cycle to see your current slab and margin.</p>
+    <div class="row2">
+      <div>
+        <label for="fUnits">Units so far this cycle</label>
+        <input type="number" id="fUnits" placeholder="e.g. 185">
+      </div>
+      <div>
+        <label for="fAvg">Your 6-month average units</label>
+        <input type="number" id="fAvg" placeholder="e.g. 170">
+      </div>
+    </div>
+    <button class="small-primary" id="findBtn">Find my position</button>
+    <div class="finder-result" id="finderResult"></div>
+  </div>
+
+  <div class="card">
+    <h2>How your category is decided</h2>
+    <p class="sub">Get this wrong and every other number is wrong.</p>
+    <ul class="rules-list">
+      <li><strong>Protected:</strong> your 6-month average is 200 units or fewer, no AC is registered on your meter, and this month's usage also stays at or under 200 units.</li>
+      <li><strong>Unprotected:</strong> everyone else — including a protected consumer whose usage crosses 200 units in a single month. That one month gets billed at unprotected rates even if every other month was well within the protected range.</li>
+      <li><strong>Non-telescopic billing:</strong> for unprotected consumers, the rate for the slab you land in applies to your entire month's units — not just the units above the previous threshold.</li>
+      <li><strong>One-slab benefit:</strong> protected consumers get a small cushion — they're billed at the rate of one slab below the one their units actually land in.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Protected consumer rates</h2>
+    <p class="sub">Applies only if avg. usage ≤200 units, no AC on meter, and this month ≤200 units.</p>
+    <table>
+      <tr><th>Units</th><th>Rate (Rs/unit)</th></tr>
+      <tr><td>1 – 100</td><td>10.54</td></tr>
+      <tr><td>101 – 200</td><td>13.01</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Unprotected consumer rates</h2>
+    <p class="sub">Applies to everyone else. Rate shown applies to the entire month's units once that band is reached.</p>
+    <table>
+      <tr><th>Units</th><th>Rate (Rs/unit)</th></tr>
+      <tr><td>1 – 100</td><td>16.72</td></tr>
+      <tr><td>101 – 200</td><td>21.53</td></tr>
+      <tr><td>201 – 300</td><td>25.34</td></tr>
+      <tr><td>301 – 400</td><td>29.10</td></tr>
+      <tr><td>401 – 500</td><td>33.85</td></tr>
+      <tr><td>501 – 600</td><td>38.10</td></tr>
+      <tr><td>601 – 700</td><td>42.90</td></tr>
+      <tr><td>700+</td><td>47.20</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Frequently asked</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q"><span>What is FCA and why isn't it in the slab table?</span><span class="chevron">▾</span></div>
+        <div class="faq-a">Fuel Charge Adjustment reflects month-to-month changes in fuel costs and is set separately from the base slab rate. It changes almost every billing cycle, so there's no fixed number to hardcode — check your DISCO's latest notice or your last bill.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><span>I have an AC — does that always push me to unprotected rates?</span><span class="chevron">▾</span></div>
+        <div class="faq-a">Yes. Having an AC registered on your meter removes protected-consumer eligibility regardless of how many units you actually use.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><span>Why did my bill jump so much for only a small usage increase?</span><span class="chevron">▾</span></div>
+        <div class="faq-a">Almost always this is the non-telescopic billing rule — crossing a slab threshold re-rates your entire month's consumption, not just the units above the line. Use the Bill Checker to see exactly how much of the jump is due to this.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><span>Are these numbers guaranteed accurate?</span><span class="chevron">▾</span></div>
+        <div class="faq-a">These reflect the published domestic tariff schedule as of early 2026. NEPRA revises rates periodically and FCA changes monthly — always treat this as a strong estimate and reference tool, not a replacement for your official duplicate bill.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  Free, open reference tool — not affiliated with NEPRA or any DISCO.
+</footer>
+
+<script>
+const PROTECTED_SLABS = [
+  { upTo: 100, rate: 10.54 },
+  { upTo: 200, rate: 13.01 }
+];
+const UNPROTECTED_SLABS = [
+  { upTo: 100, rate: 16.72 },
+  { upTo: 200, rate: 21.53 },
+  { upTo: 300, rate: 25.34 },
+  { upTo: 400, rate: 29.10 },
+  { upTo: 500, rate: 33.85 },
+  { upTo: 600, rate: 38.10 },
+  { upTo: 700, rate: 42.90 },
+  { upTo: Infinity, rate: 47.20 }
+];
+
+function rateForUnits(units, slabs) {
+  for (const slab of slabs) if (units <= slab.upTo) return slab;
+  return slabs[slabs.length - 1];
+}
+
+document.getElementById('findBtn').addEventListener('click', () => {
+  const units = parseFloat(document.getElementById('fUnits').value);
+  const avg = parseFloat(document.getElementById('fAvg').value);
+  const box = document.getElementById('finderResult');
+
+  if (isNaN(units) || isNaN(avg)) {
+    alert('Please enter both values.');
+    return;
+  }
+
+  const isProtected = avg <= 200 && units <= 200;
+  const slabs = isProtected ? PROTECTED_SLABS : UNPROTECTED_SLABS;
+  const slab = rateForUnits(units, slabs);
+  const slabIndex = slabs.indexOf(slab);
+  const remaining = slab.upTo === Infinity ? null : slab.upTo - units;
+
+  box.classList.add('show');
+  if (remaining === null) {
+    box.className = 'finder-result show safe';
+    box.innerHTML = "You're in the top slab (" + (isProtected ? 'Protected' : 'Unprotected') + ") at Rs " + slab.rate.toFixed(2) + '/unit — no higher slab to cross into.';
+  } else if (remaining <= 10) {
+    box.className = 'finder-result show tight';
+    box.innerHTML = '⚑ Only ' + remaining + ' unit' + (remaining === 1 ? '' : 's') + ' left before you cross into the next slab (Rs ' + slabs[slabIndex + 1].rate.toFixed(2) + '/unit, ' + (isProtected ? 'Protected' : 'Unprotected') + '). Worth watching your usage closely for the rest of the cycle.';
+  } else {
+    box.className = 'finder-result show safe';
+    box.innerHTML = 'You have ' + remaining + ' units of room before the next slab (' + (isProtected ? 'Protected' : 'Unprotected') + ', currently Rs ' + slab.rate.toFixed(2) + '/unit).';
+  }
+});
+
+document.querySelectorAll('.faq-item').forEach(item => {
+  item.querySelector('.faq-q').addEventListener('click', () => {
+    item.classList.toggle('open');
+  });
+});
+</script>
+</body>
+</html>
